@@ -42,8 +42,8 @@ const RegisterForm = () => {
       } else {
         setShowBanner(false);
       }
+      setIsLoading(false);
     });
-    setIsLoading(false);
   };
 
   return (

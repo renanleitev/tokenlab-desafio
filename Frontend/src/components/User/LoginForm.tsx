@@ -40,8 +40,8 @@ const LoginForm = () => {
       } else {
         setShowBanner(false);
       }
+      setIsLoading(false);
     });
-    setIsLoading(false);
   };
 
   return (
