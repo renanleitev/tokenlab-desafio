@@ -45,8 +45,6 @@ const RegisterForm = () => {
     dispatch(register(user)).finally(() => {
       if (errorMessage) {
         setShowBanner(true);
-      } else {
-        setShowBanner(false);
       }
       setIsLoading(false);
     });

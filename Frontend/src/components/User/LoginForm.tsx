@@ -41,6 +41,9 @@ const LoginForm = () => {
     e.preventDefault();
     setIsLoading(true);
     dispatch(login(user)).finally(() => {
+      if (errorMessage) {
+        setShowBanner(true);
+      }
       setIsLoading(false);
     });
   };
