@@ -33,6 +33,12 @@ const RegisterForm = () => {
     }
   }, [isRegistered, navigate]);
 
+  useEffect(() => {
+    if (errorMessage) {
+      setShowBanner(true);
+    }
+  }, [errorMessage]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

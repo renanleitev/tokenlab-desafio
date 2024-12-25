@@ -31,15 +31,16 @@ const LoginForm = () => {
     }
   }, [isLoggedIn, navigate]);
 
+  useEffect(() => {
+    if (errorMessage) {
+      setShowBanner(true);
+    }
+  }, [errorMessage]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     dispatch(login(user)).finally(() => {
-      if (errorMessage) {
-        setShowBanner(true);
-      } else {
-        setShowBanner(false);
-      }
       setIsLoading(false);
     });
   };
