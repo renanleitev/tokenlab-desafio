@@ -10,7 +10,7 @@ const SubmitButton = ({
   buttonColor = 'btn-primary',
 }: SubmitButtonProps) => {
   return (
-    <button type="submit" className={`btn ${buttonColor} w-100`}>
+    <button type="submit" className={`btn ${buttonColor} w-100`} disabled={isLoading}>
       {isLoading ? (
         <span
           className="spinner-border spinner-border-sm pr-2"
