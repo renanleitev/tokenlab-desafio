@@ -36,7 +36,7 @@ const RegisterForm = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    dispatch(register(user)).then(() => {
+    dispatch(register(user)).finally(() => {
       if (errorMessage) {
         setShowBanner(true);
       } else {

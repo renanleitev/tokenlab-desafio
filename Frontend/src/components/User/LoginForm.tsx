@@ -34,7 +34,7 @@ const LoginForm = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    dispatch(login(user)).then(() => {
+    dispatch(login(user)).finally(() => {
       if (errorMessage) {
         setShowBanner(true);
       } else {
