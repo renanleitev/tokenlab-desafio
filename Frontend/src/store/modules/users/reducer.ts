@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 
 import { type User } from '../../../types/User';
 import { API_URL } from '../../../config/api';
@@ -7,21 +7,24 @@ import { API_URL } from '../../../config/api';
 export const initialUser: User = {
   id: 0,
   email: '',
-  senha: '',
 };
 
 export type UserInitialState = {
   isLoggedIn: boolean;
+  isRegistered: boolean;
   fetchStatus: 'SUCCESS' | 'PENDING' | 'FAILURE' | '';
-  error: string;
+  errorLogin: string;
+  errorRegister: string;
   user: User;
   users: User[];
 };
 
 export const initialState: UserInitialState = {
   isLoggedIn: false,
+  isRegistered: false,
   fetchStatus: '',
-  error: '',
+  errorLogin: '',
+  errorRegister: '',
   user: initialUser,
   users: [],
 };
@@ -30,15 +33,49 @@ export const initialState: UserInitialState = {
 export const register = createAsyncThunk(
   'users/register',
   async (user: User) => {
-    const response = await axios.post(`${API_URL}/auth/register`, user);
-    return { ...response.data, ...user };
+    const { email, senha, confirmarSenha } = user;
+    // Validação dos campos (email, senha e confirmar senha)
+    if (!email || !senha || !confirmarSenha) {
+      throw new Error('Por favor, preencha todos os campos.');
+    }
+    if (senha !== confirmarSenha) {
+      throw new Error('As senhas não coincidem.');
+    }
+    try {
+      const response = await axios.post(`${API_URL}/auth/register`, user);
+      return {
+        id: response.data?.id,
+        token: response.data?.token,
+        email: user.email,
+      };
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message;
+        throw new Error(errorMessage);
+      } else {
+        throw new Error('Erro ao efetuar cadastro. Tente novamente.');
+      }
+    }
   },
 );
 
-// Função para registro de usuário
+// Função para login de usuário
 export const login = createAsyncThunk('users/login', async (user: User) => {
-  const response = await axios.post(`${API_URL}/auth/login`, user);
-  return { ...response.data, ...user };
+  try {
+    const response = await axios.post(`${API_URL}/auth/login`, user);
+    return {
+      id: response.data?.id,
+      token: response.data?.token,
+      email: user.email,
+    };
+  } catch (error) {
+    if (isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message;
+      throw new Error(errorMessage);
+    } else {
+      throw new Error('Erro ao realizar login. Tente novamente.');
+    }
+  }
 });
 
 export const usersSlice = createSlice({
@@ -47,9 +84,11 @@ export const usersSlice = createSlice({
   reducers: {
     logoutUser: (state) => {
       state.isLoggedIn = false;
+      state.isRegistered = false;
       state.user = initialUser;
       state.fetchStatus = 'PENDING';
-      state.error = '';
+      state.errorLogin = '';
+      state.errorRegister = '';
       state.users = [];
     },
   },
@@ -60,7 +99,9 @@ export const usersSlice = createSlice({
         state.fetchStatus = 'SUCCESS';
         state.user = { ...action.payload };
         state.isLoggedIn = true;
-        state.error = '';
+        state.isRegistered = true;
+        state.errorRegister = '';
+        state.errorLogin = '';
         localStorage.setItem('token', action.payload.token);
       })
       .addCase(register.pending, (state) => {
@@ -68,7 +109,8 @@ export const usersSlice = createSlice({
       })
       .addCase(register.rejected, (state, action) => {
         state.fetchStatus = 'FAILURE';
-        state.error = action.error.message || 'Error';
+        state.isRegistered = false;
+        state.errorRegister = action.error.message || 'Error';
         state.user = initialUser;
       })
       // login
@@ -76,7 +118,8 @@ export const usersSlice = createSlice({
         state.fetchStatus = 'SUCCESS';
         state.user = { ...action.payload };
         state.isLoggedIn = true;
-        state.error = '';
+        state.errorRegister = '';
+        state.errorLogin = '';
         localStorage.setItem('token', action.payload.token);
       })
       .addCase(login.pending, (state) => {
@@ -84,7 +127,7 @@ export const usersSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.fetchStatus = 'FAILURE';
-        state.error = action.error.message || 'Error';
+        state.errorLogin = action.error.message || 'Error';
         state.user = initialUser;
       });
   },

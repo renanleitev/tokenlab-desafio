@@ -1,5 +1,6 @@
 export type User = {
   id?: number;
   email: string;
-  senha: string;
+  senha?: string;
+  confirmarSenha?: string;
 };

@@ -53,7 +53,7 @@ const InvitationList = ({ invitations }: InvitationListProps) => {
 
   return (
     <div className="table-responsive">
-      <BannerMessage message={error} />
+      <BannerMessage message={error} isBannerDisplayed={Boolean(error)} />
       <table className="table table-bordered table-hover">
         <thead className="table-primary">
           <tr>

@@ -1,62 +1,49 @@
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isAxiosError } from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { AppThunkDispatch } from '../../store';
 import { register } from '../../store/modules/users/reducer';
 import { type User } from '../../types/User';
 import SubmitButton from '../_UI/SubmitButton';
 import BannerMessage from '../_UI/BannerMessage';
-
-type RegisterUser = User & {
-  confirmarSenha: string;
-};
+import { RootStateType } from '../../store/modules/rootReducer';
 
 const RegisterForm = () => {
-  const [user, setUser] = useState<RegisterUser>({
+  const isRegistered =
+    useSelector<RootStateType, boolean>((state) => state.users.isRegistered) ||
+    false;
+  const errorMessage =
+    useSelector<RootStateType, string>((state) => state.users.errorRegister) ||
+    '';
+  const [user, setUser] = useState<User>({
     email: '',
     senha: '',
     confirmarSenha: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [showBanner, setShowBanner] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch<AppThunkDispatch>();
 
+  useEffect(() => {
+    if (isRegistered) {
+      navigate('/events');
+    }
+  }, [isRegistered, navigate]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    const { email, senha, confirmarSenha } = user;
-
-    // Validação dos campos (email, senha e confirmar senha)
-    if (!email || !senha || !confirmarSenha) {
-      setError('Por favor, preencha todos os campos.');
-      return;
-    }
-
-    if (senha !== confirmarSenha) {
-      setError('As senhas não coincidem.');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError('');
-      dispatch(register(user));
-      navigate('/login'); // Redireciona para a página de login após o cadastro
-    } catch (error) {
-      if (isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message;
-        setError(errorMessage);
+    setIsLoading(true);
+    dispatch(register(user)).then(() => {
+      if (errorMessage) {
+        setShowBanner(true);
       } else {
-        setError('Erro ao criar a conta. Tente novamente.');
+        setShowBanner(false);
       }
-      console.error('Erro ao criar a conta', error);
-    } finally {
-      setIsLoading(false);
-    }
+    });
+    setIsLoading(false);
   };
 
   return (
@@ -71,7 +58,7 @@ const RegisterForm = () => {
           className="form-control"
           value={user.email}
           onChange={(e) => {
-            setError('');
+            setShowBanner(false);
             setUser({ ...user, email: e.target.value });
           }}
           required
@@ -88,7 +75,7 @@ const RegisterForm = () => {
           className="form-control"
           value={user.senha}
           onChange={(e) => {
-            setError('');
+            setShowBanner(false);
             setUser({ ...user, senha: e.target.value });
           }}
           required
@@ -105,14 +92,14 @@ const RegisterForm = () => {
           className="form-control"
           value={user.confirmarSenha}
           onChange={(e) => {
-            setError('');
+            setShowBanner(false);
             setUser({ ...user, confirmarSenha: e.target.value });
           }}
           required
         />
       </div>
 
-      <BannerMessage message={error} />
+      <BannerMessage message={errorMessage} isBannerDisplayed={showBanner} />
 
       <SubmitButton
         isLoading={isLoading}

@@ -136,7 +136,7 @@ const EventForm = ({ event }: EventFormProps) => {
         />
       </div>
 
-      <BannerMessage message={error} />
+      <BannerMessage message={error} isBannerDisplayed={Boolean(error)} />
 
       <SubmitButton
         isLoading={isLoading}

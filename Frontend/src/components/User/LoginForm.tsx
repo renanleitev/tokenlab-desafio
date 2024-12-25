@@ -1,45 +1,47 @@
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppThunkDispatch } from '../../store';
 
 import { login } from '../../store/modules/users/reducer';
 import { type User } from '../../types/User';
 import SubmitButton from '../_UI/SubmitButton';
 import BannerMessage from '../_UI/BannerMessage';
+import { RootStateType } from '../../store/modules/rootReducer';
 
 const LoginForm = () => {
+  const isLoggedIn =
+    useSelector<RootStateType, boolean>((state) => state.users.isLoggedIn) ||
+    false;
+  const errorMessage =
+    useSelector<RootStateType, string>((state) => state.users.errorLogin) || '';
   const [user, setUser] = useState<User>({
     email: '',
     senha: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [showBanner, setShowBanner] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch<AppThunkDispatch>();
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/events');
+    }
+  }, [isLoggedIn, navigate]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    const { email, senha } = user;
-
-    if (!email || !senha) {
-      setError('Por favor, preencha todos os campos.');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError('');
-      dispatch(login(user));
-      navigate('/events');
-    } catch (error) {
-      setError('Erro ao fazer login. Tente novamente.');
-      console.error('Erro ao fazer login', error);
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    dispatch(login(user)).then(() => {
+      if (errorMessage) {
+        setShowBanner(true);
+      } else {
+        setShowBanner(false);
+      }
+    });
+    setIsLoading(false);
   };
 
   return (
@@ -54,7 +56,7 @@ const LoginForm = () => {
           className="form-control"
           value={user.email}
           onChange={(e) => {
-            setError('');
+            setShowBanner(false);
             setUser({ ...user, email: e.target.value });
           }}
           required
@@ -71,14 +73,14 @@ const LoginForm = () => {
           className="form-control"
           value={user.senha}
           onChange={(e) => {
-            setError('');
+            setShowBanner(false);
             setUser({ ...user, senha: e.target.value });
           }}
           required
         />
       </div>
 
-      <BannerMessage message={error} />
+      <BannerMessage message={errorMessage} isBannerDisplayed={showBanner} />
 
       <SubmitButton isLoading={isLoading} buttonText="Entrar" />
     </form>

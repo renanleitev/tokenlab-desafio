@@ -48,6 +48,7 @@ const EventList = ({ events }: EventListProps) => {
       <BannerMessage
         message={message}
         intent={isDeleted ? 'SUCCESS' : 'ERROR'}
+        isBannerDisplayed={Boolean(message)}
       />
       <table className="table table-bordered table-hover">
         <thead className="table-primary">

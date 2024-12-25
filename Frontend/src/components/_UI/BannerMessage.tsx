@@ -3,11 +3,20 @@ import { useEffect, useState } from 'react';
 type BannerMessageProps = {
   message: string;
   intent?: 'SUCCESS' | 'ERROR';
+  isBannerDisplayed: boolean;
 };
 
-const BannerMessage = ({ message, intent = 'ERROR' }: BannerMessageProps) => {
+const BannerMessage = ({ message, intent = 'ERROR', isBannerDisplayed }: BannerMessageProps) => {
   const [color, setColor] = useState('');
-  const [showBanner, setShowBanner] = useState(true);
+  const [showBanner, setShowBanner] = useState(isBannerDisplayed);
+
+  useEffect(() => {
+    if (isBannerDisplayed) {
+      setShowBanner(true);
+    } else {
+      setShowBanner(false);
+    }
+  }, [isBannerDisplayed]);
 
   useEffect(() => {
     switch (intent) {

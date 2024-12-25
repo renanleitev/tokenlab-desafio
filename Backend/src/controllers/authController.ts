@@ -24,7 +24,13 @@ export const register = async (req: Request, res: Response) => {
 
   const hash = await bcrypt.hash(senha, 10);
   const user = await User.create({ email, senha: hash });
-  res.status(201).json({ message: 'Usuário registrado com sucesso', user });
+  res
+    .status(201)
+    .json({
+      message: 'Usuário registrado com sucesso',
+      id: user.id,
+      email: user.email,
+    });
 };
 
 export const login = async (req: Request, res: Response) => {
