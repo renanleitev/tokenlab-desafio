@@ -4,9 +4,15 @@ type BannerMessageProps = {
   message: string;
   intent?: 'SUCCESS' | 'ERROR';
   isBannerDisplayed: boolean;
+  showCloseButton?: boolean;
 };
 
-const BannerMessage = ({ message, intent = 'ERROR', isBannerDisplayed }: BannerMessageProps) => {
+const BannerMessage = ({
+  message,
+  intent = 'ERROR',
+  isBannerDisplayed,
+  showCloseButton = false,
+}: BannerMessageProps) => {
   const [color, setColor] = useState('');
   const [showBanner, setShowBanner] = useState(isBannerDisplayed);
 
@@ -34,13 +40,15 @@ const BannerMessage = ({ message, intent = 'ERROR', isBannerDisplayed }: BannerM
     return (
       <div className={`d-flex w-100 alert ${color} mt-3`}>
         {message}
-        <button
-          type="button"
-          className="btn-close"
-          style={{ marginLeft: 'auto' }}
-          aria-label="Close"
-          onClick={() => setShowBanner(false)}
-        ></button>
+        {showCloseButton && (
+          <button
+            type="button"
+            className="btn-close"
+            style={{ marginLeft: 'auto' }}
+            aria-label="Close"
+            onClick={() => setShowBanner(false)}
+          ></button>
+        )}
       </div>
     );
   }
