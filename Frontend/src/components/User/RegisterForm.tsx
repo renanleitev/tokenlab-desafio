@@ -29,7 +29,7 @@ const RegisterForm = () => {
 
   useEffect(() => {
     if (isRegistered) {
-      navigate('/events');
+      navigate('/login');
     }
   }, [isRegistered, navigate]);
 
