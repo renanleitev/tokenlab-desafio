@@ -98,7 +98,7 @@ export const usersSlice = createSlice({
       .addCase(register.fulfilled, (state, action) => {
         state.fetchStatus = 'SUCCESS';
         state.user = { ...action.payload };
-        state.isLoggedIn = true;
+        state.isLoggedIn = false;
         state.isRegistered = true;
         state.errorRegister = '';
         state.errorLogin = '';
@@ -118,6 +118,7 @@ export const usersSlice = createSlice({
         state.fetchStatus = 'SUCCESS';
         state.user = { ...action.payload };
         state.isLoggedIn = true;
+        state.isRegistered = true;
         state.errorRegister = '';
         state.errorLogin = '';
         localStorage.setItem('token', action.payload.token);
