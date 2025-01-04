@@ -7,9 +7,13 @@ import BannerMessage from '../_UI/BannerMessage';
 
 type InvitationListProps = {
   invitations: Invitation[];
+  onFetchInvitations: (value: boolean) => void;
 };
 
-const InvitationList = ({ invitations }: InvitationListProps) => {
+const InvitationList = ({
+  invitations,
+  onFetchInvitations,
+}: InvitationListProps) => {
   const [error, setError] = useState('');
 
   const handleResponse = async (
@@ -17,8 +21,8 @@ const InvitationList = ({ invitations }: InvitationListProps) => {
     response: InvitationStatus,
   ) => {
     try {
+      onFetchInvitations(true);
       await respondToInvitation(invitationId, response);
-      window.location.reload();
     } catch (error) {
       if (isAxiosError(error)) {
         const errorMessage = error.response?.data?.message;
@@ -27,6 +31,8 @@ const InvitationList = ({ invitations }: InvitationListProps) => {
         setError('Erro ao atualizar o evento. Tente novamente.');
       }
       console.error('Erro ao responder convite', error);
+    } finally {
+      onFetchInvitations(false);
     }
   };
 

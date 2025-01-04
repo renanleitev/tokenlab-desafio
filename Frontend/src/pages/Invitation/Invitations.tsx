@@ -11,11 +11,12 @@ import { type User } from '../../types/User';
 
 const Invitations = () => {
   const user =
-  useSelector<RootStateType, User>((state) => state.users.user) || undefined;
+    useSelector<RootStateType, User>((state) => state.users.user) || undefined;
 
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setisError] = useState(false);
+  const [isFetchingInvitations, setIsFetchingInvitations] = useState(false);
 
   useEffect(() => {
     const fetchInvitations = async () => {
@@ -31,7 +32,7 @@ const Invitations = () => {
       }
     };
     fetchInvitations();
-  }, [user]);
+  }, [user, isFetchingInvitations]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -44,7 +45,10 @@ const Invitations = () => {
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">Lista de Convites</h2>
-      <InvitationList invitations={invitations} />
+      <InvitationList
+        invitations={invitations}
+        onFetchInvitations={setIsFetchingInvitations}
+      />
     </div>
   );
 };
