@@ -16,6 +16,7 @@ const Events = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isFetchingEvents, setIsFetchingEvents] = useState(false);
 
   const navigate = useNavigate();
 
@@ -32,7 +33,7 @@ const Events = () => {
           const responseEventsAcceptedByUser = await getAcceptedEvents(user.id);
           const eventsAcceptedByUser = responseEventsAcceptedByUser.data;
           // Agrupando os eventos
-          setEvents([ ...eventsCreatedByUser, ...eventsAcceptedByUser ]);
+          setEvents([...eventsCreatedByUser, ...eventsAcceptedByUser]);
         }
       } catch (error) {
         setIsError(true);
@@ -42,7 +43,7 @@ const Events = () => {
       }
     };
     fetchEvents();
-  }, [user?.id]);
+  }, [user?.id, isFetchingEvents]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -64,7 +65,7 @@ const Events = () => {
           Criar Evento
         </button>
       </div>
-      <EventList events={events} />
+      <EventList events={events} onFetchEvents={setIsFetchingEvents} />
     </div>
   );
 };

@@ -11,9 +11,10 @@ import { type User } from '../../types/User';
 
 type EventListProps = {
   events: Event[];
+  onFetchEvents: (value: boolean) => void;
 };
 
-const EventList = ({ events }: EventListProps) => {
+const EventList = ({ events, onFetchEvents }: EventListProps) => {
   const user =
     useSelector<RootStateType, User>((state) => state?.users?.user) ||
     undefined;
@@ -28,10 +29,10 @@ const EventList = ({ events }: EventListProps) => {
       return;
     }
     try {
+      onFetchEvents(true);
       await deleteEvent(eventId);
       setMessage('Evento apagado com sucesso!');
       setIsDeleted(true);
-      window.location.reload();
     } catch (error) {
       if (isAxiosError(error)) {
         const errorMessage = error.response?.data?.message;
@@ -40,6 +41,8 @@ const EventList = ({ events }: EventListProps) => {
         setMessage('Erro ao apagar o evento. Tente novamente.');
       }
       console.error('Erro ao apagar evento', error);
+    } finally {
+      onFetchEvents(false);
     }
   };
 
