@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-import { getEvents, getUsers } from '../../services/api';
+import { getUserEvents, getUsers } from '../../services/api';
 import InvitationForm from '../../components/Invitation/InvitationForm';
 import LoadingScreen from '../../components/_UI/LoadingScreen';
 import ErrorScreen from '../../components/_UI/ErrorScreen';
+import { RootStateType } from '../../store/modules/rootReducer';
+import { User } from '../../types/User';
 
 const CreateInvitation = () => {
+  const user =
+    useSelector<RootStateType, User>((state) => state.users.user) || undefined;
   const [events, setEvents] = useState([]);
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,9 +22,11 @@ const CreateInvitation = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        setIsLoading(true);
-        const response = await getEvents();
-        setEvents(response.data);
+        if (user.id) {
+          setIsLoading(true);
+          const response = await getUserEvents(user.id);
+          setEvents(response.data);
+        }
       } catch (error) {
         setIsError(true);
         console.error('Erro ao obter a lista de eventos', error);
@@ -41,7 +48,7 @@ const CreateInvitation = () => {
     };
     fetchEvents();
     fetchUsers();
-  }, []);
+  }, [user.id]);
 
   if (isLoading) {
     return <LoadingScreen />;
